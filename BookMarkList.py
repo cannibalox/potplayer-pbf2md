@@ -23,13 +23,18 @@ def mark_title(line):
 # 將書籤內容整理成 md 檔
 def make_md_list(data_path):
     with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".md", filetypes=[("Markdown File","*.md")]) as bml:
+        folder_name = ""
         for path in data_path:
+            # 取得路徑中各檔案名稱
+            path_split = path.split("/")
+            # 判斷資料夾名稱是否相同 不同：寫入資料夾名稱、相同不寫入
+            if folder_name != path_split[-2]:
+                bml.write("## 資料夾： " + path_split[-2] + "\n")
+                folder_name = path_split[-2]
             # 開啟目標檔案
             with open(path, "r", encoding="utf-16LE") as f:
                 # 寫入檔案名稱
-                path_lindex = path.rfind("/")
-                path_rindex = path.rfind(".")
-                bml.write("## 檔案名稱： "+ path[path_lindex+1:path_rindex]+ "\n")
+                bml.write("### 檔案名稱： "+ path_split[-1][:-4]+ "\n")
                 #  readlines() 方法將檔案內容按新行分割成一個列表返回
                 lines = f.readlines()
                 # 遍歷
@@ -46,8 +51,15 @@ def make_md_list(data_path):
 # 將書籤內容整理成 text 檔
 def make_txt_list(data_path):
     with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".text", filetypes=[("文字文件","*.txt")]) as bml:
+        folder_name = ""
         for path in data_path:
-                        # 開啟目標檔案
+            # 取得路徑中各檔案名稱
+            path_split = path.split("/")
+            # 判斷資料夾名稱是否相同 不同：寫入資料夾名稱、相同不寫入
+            if folder_name != path_split[-2]:
+                bml.write("資料夾： " + path_split[-2] + "\n")
+                folder_name = path_split[-2]
+            # 開啟目標檔案
             with open(path, "r", encoding="utf-16LE") as f:
                 # 寫入檔案名稱
                 path_lindex = path.rfind("/")
@@ -64,7 +76,7 @@ def make_txt_list(data_path):
                         mark_titles = mark_title(line)
                         count += 1  # 書籤編號
                         print(mark_times + " " + mark_titles)
-                        bml.write(" " + str(count)+ ". "+ mark_times+ " "+ mark_titles+ "\n")  # 寫入 txt 檔
+                        bml.write("     " + str(count)+ ". "+ mark_times+ " "+ mark_titles+ "\n")  # 寫入 txt 檔
                 bml.write("\n")
 
 # 顯示選擇的檔案
