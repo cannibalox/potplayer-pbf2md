@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+import os
 
 
 # 格式化時間
@@ -80,17 +81,17 @@ def make_txt_list(data_path):
                 bml.write("\n")
 
 # 顯示選擇的檔案
-def show_list(list):
+def show_list(path):
     global list_count
     # 顯示到 file_list Listbox 上
-    file_list.insert("end","[{0}] {1}".format(list_count, list))
+    file_list.insert("end","[{0}] {1}".format(list_count, path))
     list_count += 1
     Yaxis_scrollbar.config(command=file_list.yview)
     Xaxis_scrollbar.config(command=file_list.xview)
     return None
 
 # 按鈕功能：搜尋檔案
-def File_dialog():
+def file_select():
     global data_path
     paths = filedialog.askopenfilenames(title="選擇書籤檔案",
                                           filetype=(("PotPlayer 書籤檔案", "*.pbf"),("All Files", "*.*")))
@@ -98,6 +99,18 @@ def File_dialog():
         data_path.append(path)
         show_list(path)  # 顯示選擇的檔案
     return None
+
+#按鈕功能：搜尋資料夾內所有.pbf檔案
+def folder_select():
+    global data_path
+    paths = filedialog.askdirectory(title="選擇資料夾")
+    for root, dirs, files in os.walk(paths):
+        for file_name in files:
+            if file_name.endswith(".pbf"):
+                path = os.path.join(root, file_name).replace("\\","/")
+                data_path.append(path)
+                show_list(path)
+
 
 # 建立進度條
 def make_lists_progressbar(maximum, finished):
@@ -127,8 +140,10 @@ file_list.pack(fill="x", expand="True")
 buttonFrame = tk.LabelFrame(root, height=10, relief="flat")
 buttonFrame.pack(fill="x")
 butten_packs = {"side":"left", "anchor":"n", "padx":"5"}
-button_choice = tk.Button(buttonFrame, text="選擇書籤檔案", command=lambda:File_dialog())
+button_choice = tk.Button(buttonFrame, text="選擇書籤檔案", command=lambda:file_select())
 button_choice.pack(butten_packs)
+button_folder = tk.Button(buttonFrame, text="搜尋資料夾", command=lambda:folder_select())
+button_folder.pack(butten_packs)
 button_save_md = tk.Button(buttonFrame, text="儲存為 md 檔", command=lambda:make_md_list(data_path))
 button_save_md.pack(butten_packs)
 button_save_txt = tk.Button(buttonFrame, text="儲存為純文字檔",command=lambda:make_txt_list(data_path))
