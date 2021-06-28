@@ -87,6 +87,9 @@ def File_dialog():
         show_list(path)  # 顯示選擇的檔案
     return None
 
+# 建立進度條
+def make_lists_progressbar(maximum, finished):
+    return None
 
 # 建立GUI
 root = tk.Tk()
@@ -120,5 +123,11 @@ button_save_txt = tk.Button(buttonFrame, text="儲存為純文字檔",command=la
 button_save_txt.pack(butten_packs)
 butten_exit = tk.Button(buttonFrame, text="關閉程式",command=root.destroy)
 butten_exit.pack(butten_packs)
+
+# 建立進度條
+progressbarFrame = tk.LabelFrame(root, height=10, relief="sunken")
+progressbarFrame.pack(pady=10)
+file_progressbar = ttk.Progressbar(progressbarFrame, length=450)
+file_progressbar.pack(side="left")
 
 root.mainloop()
