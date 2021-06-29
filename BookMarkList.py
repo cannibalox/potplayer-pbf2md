@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
+import time
 
 
 # 格式化時間
@@ -45,9 +46,10 @@ def make_md_list(data_path):
                         mark_times = mark_time(line)
                         mark_titles = mark_title(line)
                         count += 1  # 書籤編號
-                        print(mark_times + " " + mark_titles)
+                        # print(mark_times + " " + mark_titles)
                         bml.write(str(count)+ ". "+ mark_times+ " -- "+ mark_titles+ "\n")  # 寫入 md 檔
                 bml.write("---\n")
+            write_progressbar(data_path)
 
 # 將書籤內容整理成 text 檔
 def make_txt_list(data_path):
@@ -79,6 +81,10 @@ def make_txt_list(data_path):
                         print(mark_times + " " + mark_titles)
                         bml.write("     " + str(count)+ ". "+ mark_times+ " "+ mark_titles+ "\n")  # 寫入 txt 檔
                 bml.write("\n")
+            global write_times
+            write_times += 1
+            file_progressbar["value"] = write_times
+            root.update()
 
 # 顯示選擇的檔案
 def show_list(path):
@@ -88,6 +94,7 @@ def show_list(path):
     list_count += 1
     Yaxis_scrollbar.config(command=file_list.yview)
     Xaxis_scrollbar.config(command=file_list.xview)
+
     return None
 
 # 按鈕功能：搜尋檔案
@@ -113,8 +120,15 @@ def folder_select():
 
 
 # 建立進度條
-def make_lists_progressbar(maximum, finished):
-    return None
+def write_progressbar(data_path):
+        global write_times
+        file_progressbar["maximum"] = len(data_path)
+        write_times += 1
+        file_progressbar["value"] = write_times
+        root.update()
+        time.sleep(0.05)
+
+#     return None
 
 # 建立GUI
 root = tk.Tk()
@@ -123,6 +137,7 @@ root.geometry("500x300")
 root.resizable(False, False)   # 固定視窗大小
 data_path = []  # 紀錄選擇的檔案
 list_count = 1  # 計算列表列號
+write_times = 0
 
 # 建立 外框
 labelFrame = tk.LabelFrame(root, text="已選擇的檔案", height=10)
@@ -154,7 +169,8 @@ butten_exit.pack(butten_packs)
 # 建立進度條
 progressbarFrame = tk.LabelFrame(root, height=10, relief="sunken")
 progressbarFrame.pack(pady=10)
-file_progressbar = ttk.Progressbar(progressbarFrame, length=450)
+file_progressbar = ttk.Progressbar(progressbarFrame, mode="determinate", length=450)
+file_progressbar["value"] = 0
 file_progressbar.pack(side="left")
 
 root.mainloop()
