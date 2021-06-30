@@ -3,7 +3,6 @@ from tkinter import filedialog, messagebox, ttk
 import os
 import time
 
-
 # 格式化時間
 def mark_time(line):
     mark_lindex = line.find("=")
@@ -118,28 +117,26 @@ def folder_select():
                 data_path.append(path)
                 show_list(path)
 
-
 # 建立進度條
 def write_progressbar(data_path):
-        global write_times
-        file_progressbar["maximum"] = len(data_path)
-        write_times += 1
-        file_progressbar["value"] = write_times
-        root.update()
-        time.sleep(0.05)
-
-#     return None
+    global write_times
+    file_progressbar["maximum"] = len(data_path)
+    write_times += 1
+    file_progressbar["value"] = write_times
+    root.update()
+    time.sleep(0.05)
+    return None
 
 # 建立GUI
 root = tk.Tk()
 root.title("影片書籤統整系統")
-root.geometry("500x300")
+root.geometry("480x310")
 root.resizable(False, False)   # 固定視窗大小
 data_path = []  # 紀錄選擇的檔案
 list_count = 1  # 計算列表列號
 write_times = 0
 
-# 建立 外框
+# 建立 ListBox 外框
 labelFrame = tk.LabelFrame(root, text="已選擇的檔案", height=10)
 labelFrame.pack(fill="x")
 # 建立 X,Y 卷軸
@@ -151,26 +148,39 @@ Xaxis_scrollbar.pack(side="bottom", fill="x")
 file_list = tk.Listbox(labelFrame, height=10,yscrollcommand=Yaxis_scrollbar.set, xscrollcommand=Xaxis_scrollbar.set)
 file_list.pack(fill="x", expand="True")
 
-# 建立按鈕
-buttonFrame = tk.LabelFrame(root, height=10, relief="flat")
-buttonFrame.pack(fill="x")
-butten_packs = {"side":"left", "anchor":"n", "padx":"5"}
-button_choice = tk.Button(buttonFrame, text="選擇書籤檔案", command=lambda:file_select())
+# 建立按鈕區外框
+button_Frame = tk.LabelFrame(root, relief="flat")
+button_Frame.pack(fill="x")
+butten_packs = {"side":"left", "padx":"5"}
+    # 右邊按鈕
+button_r_Frame = tk.LabelFrame(button_Frame, relief="flat")
+button_r_Frame.pack(side="right", fill="both", expand=True)
+butten_exit = tk.Button(button_r_Frame, width=12, text="關閉程式",command=root.destroy)
+butten_exit.pack(side="left", fill="y")
+    # 上層按鈕
+button_up_Frame = tk.LabelFrame(button_Frame, relief="flat")
+button_up_Frame.pack(padx=10, fill="x")
+button_choice = tk.Button(button_up_Frame, text="選擇書籤檔案", width=12, command=lambda:file_select())
 button_choice.pack(butten_packs)
-button_folder = tk.Button(buttonFrame, text="搜尋資料夾", command=lambda:folder_select())
-button_folder.pack(butten_packs)
-button_save_md = tk.Button(buttonFrame, text="儲存為 md 檔", command=lambda:make_md_list(data_path))
+button_delete = tk.Button(button_up_Frame, width=12, text="移除檔案")
+button_delete.pack(butten_packs)
+button_save_md = tk.Button(button_up_Frame, width=12, text="儲存為 md 檔", command=lambda:make_md_list(data_path))
 button_save_md.pack(butten_packs)
-button_save_txt = tk.Button(buttonFrame, text="儲存為純文字檔",command=lambda:make_txt_list(data_path))
+    # 下層按鈕
+button_dw_Frame = tk.LabelFrame(button_Frame, relief="flat")
+button_dw_Frame.pack(padx=10, fill="x")
+button_folder = tk.Button(button_dw_Frame, width=12, text="搜尋資料夾", command=lambda:folder_select())
+button_folder.pack(butten_packs)
+button_delete_all = tk.Button(button_dw_Frame, width=12, text="移除全部檔案")
+button_delete_all.pack(butten_packs)
+button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔",command=lambda:make_txt_list(data_path))
 button_save_txt.pack(butten_packs)
-butten_exit = tk.Button(buttonFrame, text="關閉程式",command=root.destroy)
-butten_exit.pack(butten_packs)
 
 # 建立進度條
-progressbarFrame = tk.LabelFrame(root, height=10, relief="sunken")
-progressbarFrame.pack(pady=10)
+progressbarFrame = tk.LabelFrame(root, relief="sunken")
+progressbarFrame.pack(padx=10, pady=10, fill="x")
 file_progressbar = ttk.Progressbar(progressbarFrame, mode="determinate", length=450)
 file_progressbar["value"] = 0
-file_progressbar.pack(side="left")
+file_progressbar.pack()
 
 root.mainloop()
