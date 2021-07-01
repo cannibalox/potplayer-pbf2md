@@ -93,7 +93,6 @@ def show_list(path):
     list_count += 1
     Yaxis_scrollbar.config(command=file_list.yview)
     Xaxis_scrollbar.config(command=file_list.xview)
-
     return None
 
 # 按鈕功能：搜尋檔案
@@ -117,6 +116,30 @@ def folder_select():
                 data_path.append(path)
                 show_list(path)
 
+# 按鈕功能：移除檔案
+def file_delete(deAll = False):
+    global data_path
+    global list_count
+    list_count = 1
+    # 移除全部檔案
+    if deAll:
+        del data_path[0:]
+        file_list.delete(0, "end")   # 清除 List
+        return None
+    # 移除選定檔案
+    indexs = list(file_list.curselection())
+    del data_path[indexs[0]]  # 先移除 indexs 中第一個
+        # 迭代移除
+    delete_count = 1
+    for index in indexs[1:]:   
+        del data_path[index-delete_count]   # 每刪除一次索引需-1
+        delete_count += 1
+        # 重新顯示 Lsit
+    file_list.delete(0, "end")   # 清除 List
+    for path in data_path:
+        show_list(path)
+    return None
+
 # 建立進度條
 def write_progressbar(data_path):
     global write_times
@@ -124,7 +147,6 @@ def write_progressbar(data_path):
     write_times += 1
     file_progressbar["value"] = write_times
     root.update()
-    time.sleep(0.05)
     return None
 
 # 建立GUI
@@ -139,13 +161,14 @@ write_times = 0
 # 建立 ListBox 外框
 labelFrame = tk.LabelFrame(root, text="已選擇的檔案", height=10)
 labelFrame.pack(fill="x")
-# 建立 X,Y 卷軸
+    # 建立 X,Y 卷軸
 Yaxis_scrollbar = tk.Scrollbar(labelFrame, orient="vertical")
 Yaxis_scrollbar.pack(side="right", fill="y")
 Xaxis_scrollbar = tk.Scrollbar(labelFrame, orient="horizontal")
 Xaxis_scrollbar.pack(side="bottom", fill="x")
-# 建立 ListBox
-file_list = tk.Listbox(labelFrame, height=10,yscrollcommand=Yaxis_scrollbar.set, xscrollcommand=Xaxis_scrollbar.set)
+    # 建立 ListBox
+file_list = tk.Listbox(labelFrame, height=10,yscrollcommand=Yaxis_scrollbar.set, xscrollcommand=Xaxis_scrollbar.set, 
+                        selectmode="extended")
 file_list.pack(fill="x", expand="True")
 
 # 建立按鈕區外框
@@ -162,7 +185,7 @@ button_up_Frame = tk.LabelFrame(button_Frame, relief="flat")
 button_up_Frame.pack(padx=10, fill="x")
 button_choice = tk.Button(button_up_Frame, text="選擇書籤檔案", width=12, command=lambda:file_select())
 button_choice.pack(butten_packs)
-button_delete = tk.Button(button_up_Frame, width=12, text="移除檔案")
+button_delete = tk.Button(button_up_Frame, width=12, text="移除檔案", command=lambda:file_delete())
 button_delete.pack(butten_packs)
 button_save_md = tk.Button(button_up_Frame, width=12, text="儲存為 md 檔", command=lambda:make_md_list(data_path))
 button_save_md.pack(butten_packs)
@@ -171,7 +194,7 @@ button_dw_Frame = tk.LabelFrame(button_Frame, relief="flat")
 button_dw_Frame.pack(padx=10, fill="x")
 button_folder = tk.Button(button_dw_Frame, width=12, text="搜尋資料夾", command=lambda:folder_select())
 button_folder.pack(butten_packs)
-button_delete_all = tk.Button(button_dw_Frame, width=12, text="移除全部檔案")
+button_delete_all = tk.Button(button_dw_Frame, width=12, text="移除全部檔案", command=lambda:file_delete(deAll=True))
 button_delete_all.pack(butten_packs)
 button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔",command=lambda:make_txt_list(data_path))
 button_save_txt.pack(butten_packs)
