@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
-import time
 
 # 格式化時間
 def mark_time(line):
@@ -23,6 +22,8 @@ def mark_title(line):
 
 # 將書籤內容整理成 md 檔
 def make_md_list(data_path):
+    if msgbox("makelist"):
+        return None
     with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".md", filetypes=[("Markdown File","*.md")]) as bml:
         folder_name = ""
         for path in data_path:
@@ -52,6 +53,8 @@ def make_md_list(data_path):
 
 # 將書籤內容整理成 text 檔
 def make_txt_list(data_path):
+    if msgbox("makelist"):
+        return None
     with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".text", filetypes=[("文字文件","*.txt")]) as bml:
         folder_name = ""
         for path in data_path:
@@ -121,23 +124,25 @@ def file_delete(deAll = False):
     global data_path
     global list_count
     list_count = 1
-    # 移除全部檔案
-    if deAll:
-        del data_path[0:]
+    if msgbox("isdelete"):
+        # 移除全部檔案
+        if deAll:
+            del data_path[0:]
+            file_list.delete(0, "end")   # 清除 List
+            return None
+        # 移除選定檔案
+        indexs = list(file_list.curselection())
+        del data_path[indexs[0]]  # 先移除 indexs 中第一個
+            # 迭代移除
+        delete_count = 1
+        for index in indexs[1:]:   
+            del data_path[index-delete_count]   # 每刪除一次索引需-1
+            delete_count += 1
+            # 重新顯示 Lsit
         file_list.delete(0, "end")   # 清除 List
+        for path in data_path:
+            show_list(path)
         return None
-    # 移除選定檔案
-    indexs = list(file_list.curselection())
-    del data_path[indexs[0]]  # 先移除 indexs 中第一個
-        # 迭代移除
-    delete_count = 1
-    for index in indexs[1:]:   
-        del data_path[index-delete_count]   # 每刪除一次索引需-1
-        delete_count += 1
-        # 重新顯示 Lsit
-    file_list.delete(0, "end")   # 清除 List
-    for path in data_path:
-        show_list(path)
     return None
 
 # 建立進度條
@@ -148,6 +153,28 @@ def write_progressbar(data_path):
     file_progressbar["value"] = write_times
     root.update()
     return None
+
+# 建立對話框
+def msgbox(info):
+    global data_path
+    # 對話框-刪除功能 return False -> 不執行
+    if info == "isdelete":
+        if data_path == []:
+            messagebox.showerror("移除檔案", "未選擇檔案")
+            return False
+        return messagebox.askokcancel("移除檔案", "將移除所選取的檔案，實際檔案不會刪除\n是否執行?")
+    # 對話框-輸出功能  return Ture -> 不執行
+    elif info == "makelist":
+        if data_path == []:
+            messagebox.showerror("儲存檔案", "未選擇檔案")
+            return True
+        return False
+    # 對話框-離開功能
+    elif info == "exit":
+        if messagebox.askyesno("離開程式", "確定要離開程式?"):
+            root.destroy()
+        else:
+            return None
 
 # 建立GUI
 root = tk.Tk()
@@ -178,7 +205,7 @@ butten_packs = {"side":"left", "padx":"5"}
     # 右邊按鈕
 button_r_Frame = tk.LabelFrame(button_Frame, relief="flat")
 button_r_Frame.pack(side="right", fill="both", expand=True)
-butten_exit = tk.Button(button_r_Frame, width=12, text="關閉程式",command=root.destroy)
+butten_exit = tk.Button(button_r_Frame, width=12, text="關閉程式",command=lambda:msgbox("exit"))
 butten_exit.pack(side="left", fill="y")
     # 上層按鈕
 button_up_Frame = tk.LabelFrame(button_Frame, relief="flat")
