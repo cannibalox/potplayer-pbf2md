@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
+from typing import NoReturn
 
 # 格式化時間
 def mark_time(line):
@@ -155,7 +156,7 @@ def write_progressbar(data_path):
     return None
 
 # 建立對話框
-def msgbox(info):
+def msgbox(info, e=None):
     global data_path
     # 對話框-刪除功能 return False -> 不執行
     if info == "isdelete":
@@ -175,12 +176,21 @@ def msgbox(info):
             root.destroy()
         else:
             return None
+    # 對話框-異常處理資訊
+    elif info == "exception":
+        messagebox.showwarning("異常資訊", e)
 
 # 建立GUI
 root = tk.Tk()
 root.title("影片書籤統整系統")
 root.geometry("480x310")
 root.resizable(False, False)   # 固定視窗大小
+try:
+    root.iconbitmap("logo.ico")
+except Exception as i:
+    e = str(i) + "\n請將\"logo.ico\"檔案放置相同資料夾 "
+    msgbox("exception", e)
+    
 data_path = []  # 紀錄選擇的檔案
 list_count = 1  # 計算列表列號
 write_times = 0
