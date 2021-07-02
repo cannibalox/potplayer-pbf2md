@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
-from typing import NoReturn
 
 # 格式化時間
 def mark_time(line):
@@ -21,73 +20,52 @@ def mark_title(line):
     mark_title = line[lindex+1:rindex]   # 取得文字內容
     return str(mark_title)
 
-# 將書籤內容整理成 md 檔
-def make_md_list(data_path):
+# 將書籤內容整理成 md/text 檔
+def make_list(data_path, save_typ):
+    # 是否有選擇檔案
     if msgbox("makelist"):
         return None
-    with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".md", filetypes=[("Markdown File","*.md")]) as bml:
-        folder_name = ""
+    folder_name = ""   # 用來比對資料夾名稱 if folder_name != path_split[-2]:
+    # 判斷 md/text 寫入格式
+    if save_typ == "md":   # md 寫入格式
+        file_typ = [("Markdown File","*.md")]
+        detype = ".md"
+        folder_title = "## 資料夾： "
+        file_title = "### 檔案名稱： "
+        def md_write(cun, tim, til):
+            return cun + ". "+ tim + " -- "+ til+ "\n"
+        endline = "---\n"
+    elif save_typ == "txt":   # text 寫入格式
+        file_typ = [("文字文件","*.txt")]
+        detype = ".text"
+        folder_title = "資料夾： "
+        file_title = "     ---檔案名稱： "
+        def md_write(cun, tim, til):
+            return "     " + cun + ". "+ tim + " "+ til+ "\n"
+        endline = "\n"
+    # 寫入檔案
+    with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=detype, filetypes=file_typ) as bml:
         for path in data_path:
             # 取得路徑中各檔案名稱
             path_split = path.split("/")
             # 判斷資料夾名稱是否相同 不同：寫入資料夾名稱、相同不寫入
             if folder_name != path_split[-2]:
-                bml.write("## 資料夾： " + path_split[-2] + "\n")
+                bml.write(folder_title + path_split[-2] + "\n")
                 folder_name = path_split[-2]
-            # 開啟目標檔案
+            # 開啟選取的書籤檔案
             with open(path, "r", encoding="utf-16LE") as f:
                 # 寫入檔案名稱
-                bml.write("### 檔案名稱： "+ path_split[-1][:-4]+ "\n")
-                #  readlines() 方法將檔案內容按新行分割成一個列表返回
-                lines = f.readlines()
+                bml.write(file_title + path_split[-1][:-4]+ "\n")
                 # 遍歷
                 count = 0
-                for line in lines:
+                for line in f.readlines():
                     if "*" in line:
                         mark_times = mark_time(line)
                         mark_titles = mark_title(line)
                         count += 1  # 書籤編號
-                        # print(mark_times + " " + mark_titles)
-                        bml.write(str(count)+ ". "+ mark_times+ " -- "+ mark_titles+ "\n")  # 寫入 md 檔
-                bml.write("---\n")
+                        bml.write(md_write(str(count), mark_times, mark_titles))  # 寫入 md 檔
+                bml.write(endline)
             write_progressbar(data_path)
-
-# 將書籤內容整理成 text 檔
-def make_txt_list(data_path):
-    if msgbox("makelist"):
-        return None
-    with filedialog.asksaveasfile(title="儲存檔案", mode="w", defaultextension=".text", filetypes=[("文字文件","*.txt")]) as bml:
-        folder_name = ""
-        for path in data_path:
-            # 取得路徑中各檔案名稱
-            path_split = path.split("/")
-            # 判斷資料夾名稱是否相同 不同：寫入資料夾名稱、相同不寫入
-            if folder_name != path_split[-2]:
-                bml.write("資料夾： " + path_split[-2] + "\n")
-                folder_name = path_split[-2]
-            # 開啟目標檔案
-            with open(path, "r", encoding="utf-16LE") as f:
-                # 寫入檔案名稱
-                path_lindex = path.rfind("/")
-                path_rindex = path.rfind(".")
-                print(path_lindex)
-                bml.write("     ---檔案名稱： "+ path[path_lindex+1:path_rindex]+ "---\n")
-                #  readlines() 方法將檔案內容按新行分割成一個列表返回
-                lines = f.readlines()
-                # 遍歷
-                count = 0
-                for line in lines:
-                    if "*" in line:
-                        mark_times = mark_time(line)
-                        mark_titles = mark_title(line)
-                        count += 1  # 書籤編號
-                        print(mark_times + " " + mark_titles)
-                        bml.write("     " + str(count)+ ". "+ mark_times+ " "+ mark_titles+ "\n")  # 寫入 txt 檔
-                bml.write("\n")
-            global write_times
-            write_times += 1
-            file_progressbar["value"] = write_times
-            root.update()
 
 # 顯示選擇的檔案
 def show_list(path):
@@ -224,7 +202,7 @@ button_choice = tk.Button(button_up_Frame, text="選擇書籤檔案", width=12, 
 button_choice.pack(butten_packs)
 button_delete = tk.Button(button_up_Frame, width=12, text="移除檔案", command=lambda:file_delete())
 button_delete.pack(butten_packs)
-button_save_md = tk.Button(button_up_Frame, width=12, text="儲存為 md 檔", command=lambda:make_md_list(data_path))
+button_save_md = tk.Button(button_up_Frame, width=12, text="儲存為 md 檔", command=lambda:make_list(data_path, "md"))
 button_save_md.pack(butten_packs)
     # 下層按鈕
 button_dw_Frame = tk.LabelFrame(button_Frame, relief="flat")
@@ -233,7 +211,7 @@ button_folder = tk.Button(button_dw_Frame, width=12, text="搜尋資料夾", com
 button_folder.pack(butten_packs)
 button_delete_all = tk.Button(button_dw_Frame, width=12, text="移除全部檔案", command=lambda:file_delete(deAll=True))
 button_delete_all.pack(butten_packs)
-button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔",command=lambda:make_txt_list(data_path))
+button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔",command=lambda:make_list(data_path, "txt"))
 button_save_txt.pack(butten_packs)
 
 # 建立進度條
