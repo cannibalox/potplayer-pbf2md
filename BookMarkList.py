@@ -73,8 +73,6 @@ def show_list(path):
     # 顯示到 file_list Listbox 上
     file_list.insert("end","[{0}] {1}".format(list_count, path))
     list_count += 1
-    Yaxis_scrollbar.config(command=file_list.yview)
-    Xaxis_scrollbar.config(command=file_list.xview)
     return None
 
 # 按鈕功能：搜尋檔案
@@ -185,6 +183,8 @@ Xaxis_scrollbar.pack(side="bottom", fill="x")
 file_list = tk.Listbox(labelFrame, height=10,yscrollcommand=Yaxis_scrollbar.set, xscrollcommand=Xaxis_scrollbar.set, 
                         selectmode="extended")
 file_list.pack(fill="x", expand="True")
+Yaxis_scrollbar.config(command=file_list.yview)
+Xaxis_scrollbar.config(command=file_list.xview)
 
 # 建立按鈕區外框
 button_Frame = tk.LabelFrame(root, relief="flat")
@@ -193,7 +193,7 @@ butten_packs = {"side":"left", "padx":"5"}
     # 右邊按鈕
 button_r_Frame = tk.LabelFrame(button_Frame, relief="flat")
 button_r_Frame.pack(side="right", fill="both", expand=True)
-butten_exit = tk.Button(button_r_Frame, width=12, text="關閉程式",command=lambda:msgbox("exit"))
+butten_exit = tk.Button(button_r_Frame, width=12, text="關閉程式", command=lambda:msgbox("exit"))
 butten_exit.pack(side="left", fill="y")
     # 上層按鈕
 button_up_Frame = tk.LabelFrame(button_Frame, relief="flat")
@@ -211,7 +211,7 @@ button_folder = tk.Button(button_dw_Frame, width=12, text="搜尋資料夾", com
 button_folder.pack(butten_packs)
 button_delete_all = tk.Button(button_dw_Frame, width=12, text="移除全部檔案", command=lambda:file_delete(deAll=True))
 button_delete_all.pack(butten_packs)
-button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔",command=lambda:make_list(data_path, "txt"))
+button_save_txt = tk.Button(button_dw_Frame, width=12, text="儲存為純文字檔", command=lambda:make_list(data_path, "txt"))
 button_save_txt.pack(butten_packs)
 
 # 建立進度條
@@ -220,5 +220,27 @@ progressbarFrame.pack(padx=10, pady=10, fill="x")
 file_progressbar = ttk.Progressbar(progressbarFrame, mode="determinate", length=450)
 file_progressbar["value"] = 0
 file_progressbar.pack()
+
+# 樣式組
+    # 視窗樣式
+rootfrmecolor = "#71807E"
+root.configure(bg=rootfrmecolor)
+labelFrame.config(bg=rootfrmecolor)
+button_Frame.config(bg=rootfrmecolor)
+button_r_Frame.config(bg=rootfrmecolor)
+button_up_Frame.config(bg=rootfrmecolor)
+button_dw_Frame.config(bg=rootfrmecolor)
+progressbarFrame.config(bg=rootfrmecolor)
+    # 按鈕樣式
+buttencolor = "#A1B2AE"
+butten_exit.config(bg=buttencolor)
+button_choice.config(bg=buttencolor)
+button_delete.config(bg=buttencolor)
+button_save_md.config(bg=buttencolor)
+button_folder.config(bg=buttencolor)
+button_delete_all.config(bg=buttencolor)
+button_save_txt.config(bg=buttencolor)
+    # Listbox 樣式
+file_list.config(bg="#D7D6DC")
 
 root.mainloop()
